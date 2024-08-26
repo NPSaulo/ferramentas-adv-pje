@@ -1,27 +1,17 @@
+import time
+import random
 import requests
 from bs4 import BeautifulSoup
 
 class MNI_TJMT():
-    def __init__(self):
+    def __init__(self, usuario, senha):
         self.dict_assuntos = self.get_dict_assuntos
         self.dict_classes = self.get_dict_classes
-
+        self.usuario = usuario
+        self.senha = senha
+    x = y = 'false'
     URL = 'https://pje.tjmt.jus.br/pje/intercomunicacao' #conferir se funciona para segundo grau
-    SOAPEnvelope_CONSULTAR_PROCESSO = f"""
-                                                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://www.cnj.jus.br/servico-intercomunicacao-2.2.2/" xmlns:tip="http://www.cnj.jus.br/tipos-servico-intercomunicacao-2.2.2">
-                                                <soapenv:Header/>
-                                                <soapenv:Body>
-                                                <ser:consultarProcesso>
-                                                <tip:idConsultante>[USUARIO]</tip:idConsultante>
-                                                <tip:senhaConsultante>[SENHA]</tip:senhaConsultante>
-                                                <tip:numeroProcesso>[PROCESSO]</tip:numeroProcesso>
-                                                <tip:movimentos>[MOVIMENTOS]</tip:movimentos>
-                                                <tip:incluirDocumentos>[DOCUMENTOS]</tip:incluirDocumentos>
-                                                </ser:consultarProcesso>
-                                                </soapenv:Body>
-                                                </soapenv:Envelope>
-                                                """
-
+    
    
     def get_dict_assuntos():
         DICT_CNJ_ASSUNTOS = {}
@@ -40,16 +30,32 @@ class MNI_TJMT():
                 row_split = row[0].split(";")
                 DICT_CNJ_CLASSES[row_split[0]] = row_split[1]
 
-    def consulta_MNI(self, usuario, senha, lista_procs, movimentos = False,documentos = False, delay=None):
-    #valores de interesse
-    #há muitos outros, por ora extraindo apenas os abaixo
-        self.SOAPEnvelope_CONSULTAR_PROCESSO.replace("[USUARIO]",usuario).replace("[SENHA]",senha)
-        if movimentos == True:
-            self.SOAPEnvelope_CONSULTAR_PROCESSO.replace("[MOVIMENTOS]","false")
-        if documentos == True: 
-            self.SOAPEnvelope_CONSULTAR_PROCESSO.replace("[DOCUMENTOS]","false")
+    def consulta_MNI(self, lista_procs, movimentos = False,documentos = False, delay=None):
+        usuario = self.usuario
+        senha = self.senha
+        x = y = 'false'
+        if movimentos:
+            x = 'true'
+        if documentos: 
+            y = 'true'
+        SOAPEnvelope_CONSULTAR_PROCESSO = f"""
+                                                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://www.cnj.jus.br/servico-intercomunicacao-2.2.2/" xmlns:tip="http://www.cnj.jus.br/tipos-servico-intercomunicacao-2.2.2">
+                                                <soapenv:Header/>
+                                                <soapenv:Body>
+                                                <ser:consultarProcesso>
+                                                <tip:idConsultante>[USUARIO]</tip:idConsultante>
+                                                <tip:senhaConsultante>[SENHA]</tip:senhaConsultante>
+                                                <tip:numeroProcesso>[PROCESSO]</tip:numeroProcesso>
+                                                <tip:movimentos>{x}</tip:movimentos>
+                                                <tip:incluirDocumentos>{y}</tip:incluirDocumentos>
+                                                </ser:consultarProcesso>
+                                                </soapenv:Body>
+                                                </soapenv:Envelope>
+                                                """
+        self.SOAPEnvelope_CONSULTAR_PROCESSO= SOAPEnvelope_CONSULTAR_PROCESSO.replace("[USUARIO]",usuario).replace("[SENHA]",senha)
         for proc in lista_procs:
-            try:
+        #valores de interesse
+        #há muitos outros, por ora extraindo apenas os abaixo
                 valor_causa = None
                 codigo_localidade = None
                 classe = None
@@ -61,7 +67,9 @@ class MNI_TJMT():
                 lista_adv_at = []
                 lista_partes_pa = []
                 lista_adv_pa = []
-                response = requests.post(self.URL, data=self.SOAPEnvelope_CONSULTAR_PROCESSO.replace("[PROCESSO]",proc))
+                x = self.SOAPEnvelope_CONSULTAR_PROCESSO.replace("[PROCESSO]",proc)
+                print(x)
+                response = requests.post(self.URL, data=x)
                 xml_content = response.text
                 start_marker = '<soap:Envelope'
                 end_marker = '</soap:Envelope>'
@@ -101,15 +109,14 @@ class MNI_TJMT():
                         partes_at = polo.find_all('ns2:parte')
                         for parte in partes_at:
                             pessoa = parte.find('ns2:pessoa')
-                            # extraindo apenas o nome
-                            # caso seja de valor extrair outros atributos, apenas adicionar
+                            # extraindo apenas o nome, sem interesse nos outros atributos
                             pessoa_atributos = {
                                 'nome': pessoa['nome']
                             }
                             lista_partes_at.append(pessoa_atributos['nome'])
                             advogados = parte.find_all('ns2:advogado')
                             for advogado in advogados:
-                                #extraindo apenas o nome, sem interesse nos outros atributos
+                                #extraindo apenas o nome
                                 advogado_atributos = {
                                     'nome': advogado['nome']
                                     }
@@ -132,15 +139,16 @@ class MNI_TJMT():
                 valores = [proc[0], orgao_julgador, valor_causa, codigo_localidade, classe, str(lista_assuntos),
                         str(lista_partes_at), str(lista_adv_at), str(lista_partes_pa), str(lista_adv_pa)]
                 print(valores)
+                print(valores)
                 #atraso randomizado
                 if delay:
                     r = random.uniform(0.2,1)
                     time.sleep(r + delay)
-                resultados.append(valores)
+"""
             except Exception as e:
                 print(e)
                 print(f"Erro no processo {proc}")
-
+            """
     
 
 
