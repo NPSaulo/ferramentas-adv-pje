@@ -51,18 +51,13 @@ def down_lista_procs(nome_parte="", outros_nomes="",
             orgao_cell = proc[3]
             data_autuacao_cell = proc[4]
             classe_cell = proc[5]
-            # as outras info (polo ativo, polo passivo e última moviment. são melhor capturadas pela API do PJe)
+            # as outras info (polo ativo, polo passivo e última moviment. são melhor capturadas pela API MNI do PJe)
             nmr_proc = proc_cell.text
             orgao_txt = orgao_cell.text
             classe_jud = classe_cell.text
             dia, mes, ano = data_autuacao_cell.text.split("/")
             values = [nmr_proc, orgao_txt, dia, mes, ano, classe_jud]
-            cur.execute("""INSERT OR REPLACE INTO processos (nmr_proc,orgao_txt,dia,mes,ano,classe_jud)
-                                VALUES (?,?,?,?,?,?)""", values)
-            if json_saida != None:
-                with open(json_saida, "a") as file:
-                    json.dump(values,file)
-        con.commit()
+            print(values)
         cont_pags += 1
         botao_proxima_pag = driver.find_elements(By.CSS_SELECTOR, ".rich-datascr-button")[-2]
         botao_proxima_pag.click()
@@ -73,7 +68,7 @@ def down_lista_procs(nome_parte="", outros_nomes="",
 
 down_lista_procs(nome_parte="", outros_nomes="",
                         nome_rep="marcia niederle", cpf="", cnpj="", assunto="", classe="", num_doc="", oab="", jurisd="", orgao="",
-                        data_inicial="",data_final="", valor_ini="", valor_fim="", usuario="53543491172", senha="mn446015")
+                        data_inicial="",data_final="", valor_ini="", valor_fim="", usuario="", senha="")
     
 
 
