@@ -18,7 +18,7 @@ from selenium.webdriver.support.select import Select
 
 def down_lista_procs(nome_parte="", outros_nomes="",
                         nome_rep="", cpf="", cnpj="", assunto="", classe="", num_doc="", oab="", jurisd="", orgao="",
-                        data_inicial="",data_final="", valor_ini="", valor_fim="", usuario="", senha=""):
+                        data_inicial="",data_final="", valor_ini="", valor_fim="", usuario="", senha="",delay=3):
     driver = Webdriver_PJe_TJMT_1()
     driver.logar(usuario,senha)
     driver.ir_consulta()
@@ -57,23 +57,18 @@ def down_lista_procs(nome_parte="", outros_nomes="",
             classe_jud = classe_cell.text
             dia, mes, ano = data_autuacao_cell.text.split("/")
             values = [nmr_proc, orgao_txt, dia, mes, ano, classe_jud]
-            print(values)
+            print(values) #colocar aqui o que fazer com os dados
         cont_pags += 1
         botao_proxima_pag = driver.find_elements(By.CSS_SELECTOR, ".rich-datascr-button")[-2]
         botao_proxima_pag.click()
-        time.sleep(5)
+        time.sleep(delay)
     driver.quit()
 
 
-
+#alterar delay conforme desejado
 down_lista_procs(nome_parte="", outros_nomes="",
-                        nome_rep="marcia niederle", cpf="", cnpj="", assunto="", classe="", num_doc="", oab="", jurisd="", orgao="",
+                        nome_rep="saulo niederle pereira", cpf="", cnpj="", assunto="", classe="", num_doc="", oab="", jurisd="", orgao="",
                         data_inicial="",data_final="", valor_ini="", valor_fim="", usuario="", senha="")
     
 
 
-
-#logar
-#ir consulta
-#inserir info fornecidas
-#pesquisar em loop

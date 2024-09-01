@@ -155,7 +155,7 @@ class MNI_TJMT():
                                     lista_adv_pa.append(advogado_atributos['nome'])
                     valores = [proc[0], orgao_julgador, valor_causa, codigo_localidade, classe, str(lista_assuntos),
                             str(lista_partes_at), str(lista_adv_at), str(lista_partes_pa), str(lista_adv_pa)]
-                    print(valores)
+                    print(valores) #colocar aqui o que fazer com os valores
                     #atraso randomizado
                     if delay:
                         r = random.uniform(0.2,1)

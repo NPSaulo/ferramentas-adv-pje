@@ -6,7 +6,7 @@ from selenium import webdriver
 
 
 class Webdriver_PJe_TJMT_1(webdriver.Chrome):
-    def __init__():
+    def __init__(self):
         super().__init__()
     frame_logar_ID = "ssoFrame"
     username_CSS_SELECTOR = "input#username"
